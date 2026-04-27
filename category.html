@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Villager's Outpost</title>
+    
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.2/css/bootstrap.min.css'>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="banner">
+    <div class="banner-overlay">
+        <h1>Villager's Outpost</h1>
+        <p>Hrmmm... Best trades in the Overworld!</p>
+    </div>
+</div>
+
+<div class="container">
+    <nav class="tabs">
+    <a href="index.html" class="mc-tab">Home</a>
+    <a href="About.html" class="mc-tab">About Company</a>
+    
+    <button onclick="showCategory('Food')">Food</button>
+    <button onclick="showCategory('Armor')">Armor</button>
+    <button onclick="showCategory('Rare')">Rare Items</button>
+    <button onclick="showCategory('Decor')">Home Decor</button>
+</nav>
+    <div class="main-layout">
+        <div id="catalog" class="mc-panel">
+
+            <div id="product-list" class="view" style="display:none;"></div>
+        </div>
+
+        <div id="cart-box" class="mc-panel cart-panel">
+            <h2 class="mc-font">Inventory</h2>
+            <ul id="cart-items"></ul>
+            <div class="total-section">
+                <hr>
+                <p>Total: <span id="cart-total">0</span> <img src="https://minecraft.wiki/images/Emerald_JE3_BE3.png" width="16" alt="Emerald"></p>
+            </div>
+
+            <form action="http://52.74.133.173/cs3/checkout.php" method="post">
+                <input type="text" name="cust_name" placeholder="Character Name" required>
+                <input type="text" name="cust_addr" placeholder="Village Coordinates" required>
+                <input type="email" name="cust_email" placeholder="Mail Adress" required>
+                
+                <input type="hidden" id="cust_order_input" name="cust_order">
+                
+                <button type="submit" id="checkout-btn">Complete Trade</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+    <script>
+var products = {
+    Food: [
+        { name: "Cookie", price: 7, desc: "Simple pastry made of bread and Cocoa beans", img: "images/cookie.png" },
+        { name: "Beef", price: 5, desc: "Food item dropped by Cows", img: "images/beef.png" },
+        { name: "Pork", price: 5, desc: "Food item dropped by pigs and restores 4 hunger.", img: "images/pork.png" },
+        { name: "Chicken", price: 5, desc: "Food item dropped by chicken. Cluck!", img: "images/chicken.png" },
+        { name: "Fish", price: 5, desc: "Caught from the depths of the nearest river and can be cooked into multiple different dishes.", img: "images/fish.png" }
+    ],
+    Armor: [
+        { name: "Leather Gear", price: 20, desc: "It has the lowest durability among all armors, but it is unique for being dyeable into millions of color combinations using dyes.", img: "images/leatherarmor.png" },
+        { name: "Iron Plate", price: 40, desc: "It is stronger than gold, acting as the primary protection before obtaining diamond gear, and is essential for surviving early-to-mid-game exploration.", img: "images/ironarmor.png" },
+        { name: "Gold Plate", price: 60, desc: "While offering protection weaker than iron, it is essential for surviving the Nether, as it pacifies Piglins.", img: "images/goldarmor.png" },
+        { name: "Diamond Plate", price: 80, desc: "Diamond armor is a high-tier armor set in Minecraft, ranking as the second strongest, surpassed only by Netherite.", img: "images/diamondarmor.png" },
+        { name: "Netherite", price: 100, desc: "Diamond armor coated in a durable material found in Piglin bastions. Made from Netherite ingots, which is crafted using 4 gold ingots and 4 netherite scraps. Offers the best protection out of all armor", img: "images/netheritearmor.png" }
+    ],
+    Rare: [
+        { name: "Beacon", price: 130, desc: "A Minecraft beacon is an end-game block that projects a light beam and provides status effects (like Haste or Speed) to nearby players.", img: "images/beacon.png" },
+        { name: "Dragon Egg", price: 300, desc: "The dragon egg is a rare, decorative trophy obtained after defeating the Ender Dragon. There is one egg in every world!", img: "images/dragonegg.png" },
+        { name: "Totem", price: 75, desc: "The totem of undying is a rare single-use item that can prevent the player from taking fatal damage.", img: "images/totem.png" },
+        { name: "Mace", price: 150, desc: "The mace is a heavy melee weapon designed for high-damage smash attacks from falling.", img: "images/mace.png" },
+        { name: "Elytra", price: 200, desc: "Elytra are rare, equippable wings in Minecraft found in End Ship item frames within End Cities, allowing players to glide and fly.", img: "images/elytra.png" }
+    ],
+    Decor: [
+        { name: "Soul Lantern", price: 12, desc: "A blue light source that provides calming aesthetic to your desk while keeping the Phantoms away.", img: "images/soullantern.png" },
+        { name: "Painting", price: 8, desc: "Randomly generated pixel art to instantly upgrade your base's wall level. Every room looks better with a classic canvas.", img: "images/painting.png" },
+        { name: "Amethyst", price: 18, desc: "A beautiful purple crystal geode harvested from deep underground. It is the perfect aesthetic centerpiece to add a touch of elegance to your desk or shelf.", img: "images/crystal.png" },
+        { name: "Armor Stand", price: 25, desc: "A sturdy wooden display for your favorite armor sets. Great for organizing chestplates, helmets, and even tools", img: "images/stand.png" },
+        { name: "Bookshelf", price: 20, desc: "A solid block of knowledge. Essential for organizing your manuals, enchanted books, or small decorative trinkets.", img: "images/bookshelf.png" }
+    ]
+};
+
+var cart = [];
+
+function showCategory(cat) {
+    var productList = document.getElementById('product-list');
+    
+    productList.style.display = "block";
+
+    productList.innerHTML = "<h2 class='mc-font'>" + cat + " Trades</h2>";
+    var items = products[cat];
+    
+    for (var i = 0; i < items.length; i++) {
+        var item = items[i];
+        var div = document.createElement('div');
+        div.className = "item-card";
+        div.innerHTML = "<img src='" + item.img + "' alt='" + item.name + "'>" +
+            "<div><strong>" + item.name + "</strong><br>" +
+            "<small>" + item.desc + "</small><br>" +
+            "<span>" + item.price + " Emeralds</span><br>" +
+            "<button onclick='addToCart(\"" + item.name + "\", " + item.price + ")'>Trade</button></div>";
+        productList.appendChild(div);
+    }
+}
+
+function addToCart(name, price) {
+    var item = { prod_name: name, prod_price: price };
+    cart.push(item);
+    updateCartDisplay();
+}
+
+function removeFromCart(index) {
+    cart.splice(index, 1);
+    updateCartDisplay();
+}
+
+function updateCartDisplay() {
+    var cartList = document.getElementById('cart-items');
+    var totalSpan = document.getElementById('cart-total');
+    var total = 0;
+
+    cartList.innerHTML = "";
+    for (var j = 0; j < cart.length; j++) {
+        var li = document.createElement('li');
+        li.style.listStyle = "none";
+        li.style.marginBottom = "5px";
+        li.innerHTML = cart[j].prod_name + " (" + cart[j].prod_price + ") " +
+            "<button onclick='removeFromCart(" + j + ")' style='background:#900; color:white; border:none; cursor:pointer;'>X</button>";
+        cartList.appendChild(li);
+        total += cart[j].prod_price;
+    }
+
+    totalSpan.innerText = total;
+
+    document.getElementById('cust_order_input').value = JSON.stringify(cart);
+}
+
+showCategory('Food');
+    </script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+@charset "UTF-8";
+
+*, ::before, ::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body.home-body {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-image: url('https://assetsio.gnwcdn.com/minecrafts-long-awaited-caves-and-cliffs-part-2-update-arrives-later-this-month-1637187670873.jpg');
+    background-size: cover;
+    background-position: center;
+    font-family: 'Press Start 2P', cursive;
+}
+
+.mc-menu {
+    --btn-width: 400px;
+    --btn-height: 50px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: var(--btn-width);
+}
+
+.mc-button {
+    height: var(--btn-height);
+    width: 100%;
+    cursor: pointer;
+    text-decoration: none;
+    display: block;
+    background: #5A5A5A; /* Fallback */
+    background-image: url('https://i.ibb.co/rb2TWXL/bgbtn.png');
+    background-size: cover;
+    image-rendering: pixelated;
+    border: 3px solid #000;
+    position: relative;
+}
+
+.mc-button.static {
+    cursor: default;
+    filter: brightness(0.8);
+}
+
+.mc-button .title {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #DDD;
+    text-shadow: 2px 2px #000;
+    box-shadow: inset -4px -4px #0006, inset 4px 4px #FFF7;
+    font-size: 14px;
+    padding-bottom: 4px;
+}
+
+.mc-button:hover:not(.static) .title {
+    background-color: rgba(100, 100, 255, 0.45);
+    color: #FFFFA0;
+}
+
+.mc-button:active:not(.static) .title {
+    box-shadow: inset 4px 4px #0008;
+    padding-top: 4px;
+}
+
+.double {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    width: 100%;
+}
